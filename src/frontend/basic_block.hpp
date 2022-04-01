@@ -63,6 +63,7 @@ struct BasicBlock {
     Condition condition;
     IREmitter emitter;
     int length = 0;
+    int data_cycles = 0;
   };
 
   std::vector<MicroBlock> micro_blocks;

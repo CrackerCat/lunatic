@@ -106,6 +106,8 @@ auto Translator::Handle(ARMSingleDataTransfer const& opcode) -> Status {
     writeback();
   }
 
+  micro_block->data_cycles++;
+
   if (opcode.load && opcode.reg_dst == GPR::PC) {
     if (armv5te) {
       // Branch with exchange

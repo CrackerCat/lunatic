@@ -30,6 +30,8 @@ auto Translator::Handle(ARMSingleDataSwap const& opcode) -> Status {
     emitter->STR(Word, source, address);
   }
 
+  micro_block->data_cycles += 2;
+
   emitter->StoreGPR(IRGuestReg{opcode.reg_dst, mode}, tmp);
   EmitAdvancePC();
   return Status::Continue;

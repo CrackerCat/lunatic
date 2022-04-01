@@ -76,6 +76,7 @@ private:
   std::array<Coprocessor*, 16> coprocessors;
   IREmitter* emitter = nullptr;
   BasicBlock* basic_block = nullptr;
+  BasicBlock::MicroBlock* micro_block = nullptr;
 };
 
 } // namespace lunatic::frontend

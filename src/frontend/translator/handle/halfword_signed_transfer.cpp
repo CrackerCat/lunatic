@@ -129,6 +129,8 @@ auto Translator::Handle(ARMHalfwordSignedTransfer const& opcode) -> Status {
     }
   }
 
+  micro_block->data_cycles++;
+
   if (should_flush_pipeline) {
     if (armv5te) {
       // TODO: this probably can be optimized.

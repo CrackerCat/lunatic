@@ -34,8 +34,10 @@ auto Translator::Handle(ARMBlockDataTransfer const& opcode) -> Status {
 
     // Calculate the number of bytes to transfer.
     for (int i = 0; i <= 15; i++) {
-      if (bit::get_bit(list, i))
+      if (bit::get_bit(list, i)) {
         bytes += sizeof(u32);
+        micro_block->data_cycles++;
+      }
     }
   }
 

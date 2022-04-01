@@ -226,6 +226,8 @@ void X64Backend::Compile(BasicBlock& basic_block) {
         reg_alloc.AdvanceLocation();
       }
 
+      code->sub(rbx, micro_block.data_cycles);
+
       if (basic_block.enable_fast_dispatch && i == size - 1) {
         auto& branch_target = basic_block.branch_target;
 

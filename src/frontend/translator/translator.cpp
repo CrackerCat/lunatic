@@ -47,6 +47,7 @@ void Translator::TranslateARM(BasicBlock& basic_block) {
     emitter = &micro_block.emitter;
   };
 
+  this->micro_block = &micro_block;
   emitter = &micro_block.emitter;
 
   for (int i = 0; i < max_block_size; i++) {
@@ -97,6 +98,7 @@ void Translator::TranslateThumb(BasicBlock& basic_block) {
     .condition = Condition::AL
   };
 
+  this->micro_block = &micro_block;
   emitter = &micro_block.emitter;
 
   auto add_micro_block = [&]() {
