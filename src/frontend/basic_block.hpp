@@ -57,6 +57,7 @@ struct BasicBlock {
   }
 
   int length = 0;
+  int code_cycles = 0;
 
   struct MicroBlock {
     Condition condition;
@@ -73,7 +74,6 @@ struct BasicBlock {
   struct BranchTarget {
     Key key{};
   } branch_target;
-
 
   u32 hash = 0;
   bool enable_fast_dispatch = true;

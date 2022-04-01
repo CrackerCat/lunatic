@@ -76,6 +76,7 @@ void Translator::TranslateARM(BasicBlock& basic_block) {
 
     basic_block.length++;
     micro_block.length++;
+    basic_block.code_cycles += memory.GetInstWaitStates32(code_address);
 
     if (status == Status::BreakMicroBlock && condition != Condition::AL) {
       break_micro_block(condition);
@@ -138,6 +139,7 @@ void Translator::TranslateThumb(BasicBlock& basic_block) {
 
     basic_block.length++;
     micro_block.length++;
+    basic_block.code_cycles += memory.GetInstWaitStates16(code_address);
 
     if (status == Status::BreakBasicBlock) {
       break;

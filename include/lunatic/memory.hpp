@@ -35,6 +35,14 @@ struct Memory {
   virtual void WriteHalf(u32 address, u16 value, Bus bus) = 0;
   virtual void WriteWord(u32 address, u32 value, Bus bus) = 0;
 
+  virtual auto GetInstWaitStates16(u32 address) -> int {
+    return 1;
+  }
+
+  virtual auto GetInstWaitStates32(u32 address) -> int {
+    return 1;
+  }
+
   template<typename T, Bus bus>
   auto FastRead(u32 address) -> T {
     static_assert(is_one_of_v<T, u8, u16, u32, u64>);

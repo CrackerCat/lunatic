@@ -235,7 +235,7 @@ void X64Backend::Compile(BasicBlock& basic_block) {
           // TODO: deduplicate this code.
           if (target_block != nullptr) {
             // Return to the dispatcher if we ran out of cycles.
-            code->sub(rbx, basic_block.length);
+            code->sub(rbx, basic_block.code_cycles);
             code->jle(label_return_to_dispatch, Xbyak::CodeGenerator::T_NEAR);
 
             // Return to the dispatcher if there is an IRQ to handle
@@ -267,7 +267,7 @@ void X64Backend::Compile(BasicBlock& basic_block) {
 
     if (basic_block.enable_fast_dispatch) {
       // Return to the dispatcher if we ran out of cycles.
-      code->sub(rbx, basic_block.length);
+      code->sub(rbx, basic_block.code_cycles);
       code->jle(label_return_to_dispatch);
 
       // Return to the dispatcher if there is an IRQ to handle
