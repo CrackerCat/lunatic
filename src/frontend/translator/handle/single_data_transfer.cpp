@@ -17,9 +17,11 @@ auto Translator::Handle(ARMSingleDataTransfer const& opcode) -> Status {
   }
 
   auto offset = IRAnyRef{};
+  bool might_be_haltcnt_write = false;
 
   if (opcode.immediate) {
     offset = IRConstant{opcode.offset_imm};
+    might_be_haltcnt_write = !opcode.load && opcode.byte && opcode.offset_imm == 0x301;
   } else {
     auto& offset_reg = emitter->CreateVar(IRDataType::UInt32, "base_offset_reg");
     auto& offset_var = emitter->CreateVar(IRDataType::UInt32, "base_offset_shifted");
@@ -117,6 +119,10 @@ auto Translator::Handle(ARMSingleDataTransfer const& opcode) -> Status {
     } else {
       EmitFlushNoSwitch();
     }
+    return Status::BreakBasicBlock;
+  }
+
+  if (might_be_haltcnt_write) {
     return Status::BreakBasicBlock;
   }
 
