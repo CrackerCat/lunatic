@@ -22,6 +22,24 @@ auto Translator::Handle(ARMSingleDataTransfer const& opcode) -> Status {
   if (opcode.immediate) {
     offset = IRConstant{opcode.offset_imm};
     might_be_haltcnt_write = !opcode.load && opcode.byte && opcode.offset_imm == 0x301;
+
+    // Detect PC-relative load from a region known to be ROM.
+    if (opcode.reg_base == GPR::PC && !opcode.writeback && opcode.pre_increment && opcode.load) {
+      u32 address = (code_address & ~3) + opcode_size * 2 + opcode.offset_imm;
+
+      if (address >= 0x08000000 && address <= 0x09FFFFFF) {
+        auto& data = emitter->CreateVar(IRDataType::UInt32, "data");
+        if (opcode.byte) {
+          emitter->MOV(data, IRConstant{memory.FastRead<u8 , Memory::Bus::Data>(address)}, false); 
+        } else {
+          emitter->MOV(data, IRConstant{memory.FastRead<u32, Memory::Bus::Data>(address)}, false);
+        }
+        emitter->StoreGPR(IRGuestReg{opcode.reg_dst, mode}, data);
+        EmitAdvancePC();
+        micro_block->data_cycles++;
+        return Status::Continue;
+      }
+    }
   } else {
     auto& offset_reg = emitter->CreateVar(IRDataType::UInt32, "base_offset_reg");
     auto& offset_var = emitter->CreateVar(IRDataType::UInt32, "base_offset_shifted");
@@ -123,6 +141,7 @@ auto Translator::Handle(ARMSingleDataTransfer const& opcode) -> Status {
   }
 
   if (might_be_haltcnt_write) {
+    basic_block->enable_fast_dispatch = false;
     return Status::BreakBasicBlock;
   }
 

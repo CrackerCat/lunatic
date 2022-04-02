@@ -17,6 +17,20 @@ auto Translator::Handle(ARMHalfwordSignedTransfer const& opcode) -> Status {
 
   if (opcode.immediate) {
     offset = IRConstant{opcode.offset_imm};
+
+    // Detect PC-relative load from a region known to be ROM.
+    if (opcode.reg_base == GPR::PC && !opcode.writeback && opcode.pre_increment && opcode.load && opcode.opcode == 1) {
+      u32 address = (code_address & ~3) + opcode_size * 2 + opcode.offset_imm;
+
+      if (address >= 0x08000000 && address <= 0x09FFFFFF) {
+        auto& data = emitter->CreateVar(IRDataType::UInt32, "data");
+        emitter->MOV(data, IRConstant{memory.FastRead<u16, Memory::Bus::Data>(address)}, false);
+        emitter->StoreGPR(IRGuestReg{opcode.reg_dst, mode}, data);
+        EmitAdvancePC();
+        micro_block->data_cycles++;
+        return Status::Continue;
+      }
+    }
   } else {
     auto& offset_reg = emitter->CreateVar(IRDataType::UInt32, "base_offset");
     emitter->LoadGPR(IRGuestReg{opcode.offset_reg, mode}, offset_reg);
